@@ -1,13 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView,  RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from .models import CustomUser, BuyerProfile, SellerProfile
-from .serializers import CustomUserSerializer, BuyerProfileSerializer, SellerProfileSerializer, UserRegistrationSerializer, UserDetailSerializer
+from .serializers import (CustomUserSerializer, BuyerProfileSerializer, SellerProfileSerializer,
+                          UserRegistrationSerializer, UserDetailSerializer, ListingSerializer, BookingSerializer)
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-from .models import CustomUser
+from .models import CustomUser, Booking
 
 class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]
@@ -187,3 +189,30 @@ class SellerProfileView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except SellerProfile.DoesNotExist:
             return Response({"error": "Seller profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+class ListingListCreateView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ListingSerializer
+
+
+
+class BookingListCreateView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = BookingSerializer
+
+    def get_queryset(self):
+        if self.request.user.is_buyer:
+            return Booking.objects.filter(buyer=self.request.user)
+        return Booking.objects.none()
+
+    def perform_create(self, serializer):
+        serializer.save(buyer=self.request.user)
+
+class BookingDetailView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = BookingSerializer
+
+    def get_queryset(self):
+        if self.request.user.is_buyer:
+            return Booking.objects.filter(buyer=self.request.user)
+        return Booking.objects.none()

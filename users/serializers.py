@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, BuyerProfile, SellerProfile
+from .models import CustomUser, BuyerProfile, SellerProfile, Listing, Booking
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,3 +52,36 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'email', 'is_seller', 'is_buyer']
+        
+class ListingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Listing
+        fields = [
+            'id', 'seller', 'title', 'description', 'address', 'price_per_night',
+            'available_from', 'available_to', 'breakfast_included', 'lunch_included',
+            'dinner_included', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['seller', 'created_at', 'updated_at']
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = ['id', 'buyer', 'listing', 'check_in', 'check_out', 'total_price', 'created_at']
+        read_only_fields = ['buyer', 'total_price', 'created_at']
+
+    def validate(self, data):
+        # Ensure check-in is before check-out
+        if data['check_in'] >= data['check_out']:
+            raise serializers.ValidationError("Check-in date must be before check-out date.")
+
+        # Check for overlapping bookings
+        listing = data['listing']
+        if Booking.objects.filter(
+            listing=listing,
+            check_in__lt=data['check_out'],
+            check_out__gt=data['check_in']
+        ).exists():
+            raise serializers.ValidationError("The listing is already booked for these dates.")
+
+        return data

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'users',
     'rest_framework',
     'rest_framework_simplejwt',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -146,3 +147,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
 }
+
+
+STRIPE_SECRET_KEY = 'your_secret_key'
+STRIPE_PUBLIC_KEY = 'your_public_key'
