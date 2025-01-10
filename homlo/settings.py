@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'payments',
+    'dashboard',
+    'notifications',
+    'reviews',
+    'properties',
 ]
 
 MIDDLEWARE = [

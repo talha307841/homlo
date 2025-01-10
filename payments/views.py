@@ -7,6 +7,8 @@ from rest_framework import status
 from .models import Payment
 from users.models import Booking
 from .serializers import PaymentSerializer
+from notifications.services import create_notification
+
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -37,7 +39,14 @@ class StripePaymentIntentView(APIView):
                 stripe_payment_intent_id=payment_intent['id'],
                 status='PENDING'
             )
-
+            create_notification(
+                            user=booking.buyer,  # Notify the buyer
+                            message=f"Your payment of ${payment.amount} for {booking.property.name} was successful."
+                        )
+            create_notification(
+                            user=booking.property.owner,  # Notify the seller
+                            message=f"You have received a payment of ${payment.amount} for {booking.property.name}."
+                        )
             return Response({
                 "client_secret": payment_intent['client_secret'],
                 "payment_id": payment.id

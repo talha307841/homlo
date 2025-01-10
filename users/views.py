@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from .models import CustomUser, Booking
+from notifications.services import create_notification
 
 class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]
@@ -207,6 +208,10 @@ class BookingListCreateView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(buyer=self.request.user)
+        create_notification(
+                user=property.owner,  # Notify the seller
+                message=f"You have a new booking for {property.name} from {self.request.user.username}."
+            )
 
 class BookingDetailView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
