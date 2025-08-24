@@ -1,0 +1,63 @@
+# FastAPI and ASGI server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+psycopg2-binary==2.9.9
+asyncpg==0.29.0
+
+# Authentication and security
+python-jose[cryptography]==3.3.0
+passlib[argon2]==1.7.4
+python-multipart==0.0.6
+bcrypt==4.1.2
+
+# Redis and caching
+redis==5.0.1
+celery==5.3.4
+
+# File handling and image processing
+pillow==10.1.0
+python-magic==0.4.27
+minio==7.2.0
+
+# Validation and serialization
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# HTTP client
+httpx==0.25.2
+aiofiles==23.2.1
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
+slugify==0.1.2
+
+# Development and testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+black==23.11.0
+isort==5.12.0
+ruff==0.1.6
+
+# Environment and configuration
+python-dotenv==1.0.0
+pydantic-settings==2.1.0
+
+# Email
+jinja2==3.1.2
+aiosmtplib==3.0.1
+
+# SMS (Twilio)
+twilio==8.10.0
+
+# Monitoring and health checks
+prometheus-client==0.19.0
+
+# CORS
+fastapi-cors==0.0.6

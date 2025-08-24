@@ -1,0 +1,229 @@
+erDiagram
+    users {
+        uuid id PK
+        string email UK
+        string phone UK
+        string password_hash
+        string name
+        string photo_url
+        enum roles
+        text about
+        string[] languages
+        enum verification_level
+        float guest_score
+        string cnic_number
+        string twofa_secret
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    addresses {
+        uuid id PK
+        uuid user_id FK
+        string line1
+        string line2
+        string city
+        string area
+        float latitude
+        float longitude
+        string postcode
+        geography geog
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    listings {
+        uuid id PK
+        uuid host_id FK
+        string title
+        string slug UK
+        text description
+        string city
+        string area
+        geography geog
+        enum type
+        int max_guests
+        int bedrooms
+        int beds
+        int bathrooms
+        string[] amenities
+        text house_rules
+        boolean instant_book
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    listing_photos {
+        uuid id PK
+        uuid listing_id FK
+        string key
+        string alt_text
+        int order
+        int width
+        int height
+        timestamp created_at
+    }
+
+    pricing_rules {
+        uuid id PK
+        uuid listing_id FK
+        decimal base_price_pkr
+        decimal weekend_price_pkr
+        decimal cleaning_fee_pkr
+        decimal deposit_pkr
+        int min_nights
+        int max_nights
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    seasonal_prices {
+        uuid id PK
+        uuid listing_id FK
+        date start_date
+        date end_date
+        decimal price_pkr
+        timestamp created_at
+    }
+
+    calendars {
+        uuid id PK
+        uuid listing_id FK
+        date date
+        boolean is_blocked
+        timestamp created_at
+    }
+
+    bookings {
+        uuid id PK
+        uuid listing_id FK
+        uuid guest_id FK
+        date check_in
+        date check_out
+        int guests_count
+        enum status
+        decimal total_pkr
+        string currency
+        enum payment_status
+        string cancellation_policy
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    transactions {
+        uuid id PK
+        uuid booking_id FK
+        enum provider
+        decimal amount_pkr
+        enum status
+        string reference
+        json payload
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    message_threads {
+        uuid id PK
+        uuid listing_id FK
+        uuid guest_id FK
+        uuid host_id FK
+        timestamp last_message_at
+        timestamp created_at
+    }
+
+    messages {
+        uuid id PK
+        uuid thread_id FK
+        uuid sender_id FK
+        text text
+        string attachment_key
+        timestamp read_at
+        timestamp created_at
+    }
+
+    reviews {
+        uuid id PK
+        uuid booking_id FK
+        uuid reviewer_id FK
+        uuid reviewee_id FK
+        uuid listing_id FK
+        int overall
+        int cleanliness
+        int accuracy
+        int communication
+        int location
+        int value
+        text text
+        string[] photos
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    payout_accounts {
+        uuid id PK
+        uuid user_id FK
+        string method
+        json details
+        boolean verified
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    payouts {
+        uuid id PK
+        uuid user_id FK
+        decimal amount_pkr
+        enum status
+        timestamp requested_at
+        timestamp processed_at
+        timestamp created_at
+    }
+
+    feature_flags {
+        string key PK
+        json value
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    reports {
+        uuid id PK
+        uuid reporter_id FK
+        string target_type
+        uuid target_id
+        string reason
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Relationships
+    users ||--o{ addresses : "has"
+    users ||--o{ listings : "hosts"
+    users ||--o{ bookings : "makes"
+    users ||--o{ reviews : "writes"
+    users ||--o{ payout_accounts : "has"
+    users ||--o{ payouts : "receives"
+    users ||--o{ reports : "submits"
+
+    listings ||--o{ listing_photos : "has"
+    listings ||--o{ pricing_rules : "has"
+    listings ||--o{ seasonal_prices : "has"
+    listings ||--o{ calendars : "has"
+    listings ||--o{ bookings : "receives"
+    listings ||--o{ message_threads : "has"
+    listings ||--o{ reviews : "receives"
+
+    bookings ||--o{ transactions : "has"
+    bookings ||--o{ reviews : "generates"
+
+    message_threads ||--o{ messages : "contains"
+
+    %% Constraints and indexes
+    %% - Unique constraint on users.email and users.phone
+    %% - Unique constraint on listings.slug
+    %% - Exclusion constraint on bookings to prevent date overlaps
+    %% - Spatial index on listings.geog for geo queries
+    %% - Full-text search index on listings.title and description
